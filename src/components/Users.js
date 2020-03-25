@@ -187,7 +187,7 @@ class Users extends Component {
               {this.state.dataprofile.map((profile, index)=>{
                 return(
                   <div key={index}>
-                    <Image className='cardx img-thumbnail' src={profile.image} data-toggle="modal" data-target="#userModal" value={profile.id} onClick={this.getDataId}/> 
+                    <Image className='cardx img-thumbnail' src={profile.image}/> 
                     <p className='text-capitalize'>Hallo, {profile.name}</p> 
                     <p className='text-capitalize'>Anda login sebagai {profile.status} </p> 
                     <button className="btn btn-sm btn-primary" data-toggle="modal" data-target="#userModal" value={profile.id} onClick={this.getDataId}>edit</button>

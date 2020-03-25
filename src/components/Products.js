@@ -238,7 +238,10 @@ class Products extends Component {
               
               </Card.Body>
               <Card.Footer> 
-                prev 1 next
+                <button value={this.state.prevpage}>prev</button> 
+                <button disabled>{this.state.currenpage}</button>
+                <button value={this.state.nextpage}>next</button>  
+                page: {this.state.currenpage} of {this.state.totalpage}. rows: {this.state.totalrows}
               </Card.Footer>
             </Card>
             </Col>
