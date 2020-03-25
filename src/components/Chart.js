@@ -66,7 +66,7 @@ export default class Chart extends Component {
 
   componentDidMount() {
 
-    Axios.get("http://localhost:8080/api/chart/", {
+    Axios.get(`${process.env.REACT_APP_URL_API}chart/`, {
       headers: { "x-access-token": localStorage.usertoken }
     })
       .then(res => {

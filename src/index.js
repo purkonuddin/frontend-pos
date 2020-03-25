@@ -1,59 +1,9 @@
-// src/index.js
-
-// import React from "react";
-// import ReactDOM from "react-dom";
-// import App from "./App";
-// import * as serviceWorker from "./serviceWorker";
-// import { Auth0Provider } from "./react-auth0-spa";
-// import config from "./auth_config.json";
-// import history from "./utils/history";
-//
-// // A function that routes the user to the right place
-// // after login
-// const onRedirectCallback = appState => {
-//   history.push(
-//     appState && appState.targetUrl
-//       ? appState.targetUrl
-//       : window.location.pathname
-//   );
-// };
-//
-// ReactDOM.render(
-//   <Auth0Provider
-//     domain={config.domain}
-//     client_id={config.clientId}
-//     redirect_uri={window.location.origin}
-//     onRedirectCallback={onRedirectCallback}
-//   >
-//     <App />
-//   </Auth0Provider>,
-//   document.getElementById("root")
-// );
-//
-// serviceWorker.unregister();
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Routes from './Routes';
 import * as serviceWorker from './serviceWorker';
-// import { createStore } from 'redux';
 import {Provider} from 'react-redux';
 import store from "./redux/store";
-
-// const stateProducts={
-//   products:[{
-//     id_product:'1',
-//     nama_product:'cimory',
-//     price:1000
-//   }],
-//   user:''
-// }
-// // reducer
-// const reducerProducts= (state=stateProducts)=>{
-//   return state;
-// }
-
-// store
-// const store = createStore(reducerProducts);
 
 ReactDOM.render(<Provider store={store}><Routes/></Provider>, document.getElementById('root'));
 

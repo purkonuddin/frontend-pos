@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import {connect} from 'react-redux';
-import { Container, Row ,Card, ListGroup, ListGroupItem, Navbar, Nav, NavDropdown, Form, Button, FormControl, Table } from 'react-bootstrap';
-import { Link } from "react-router-dom";
+import { Container, Row ,Card, Form, Button, FormControl } from 'react-bootstrap';
+// import { Link } from "react-router-dom";
 
 class Search extends Component{
   constructor(props){
@@ -19,7 +19,7 @@ class Search extends Component{
 
   handleSubmit=(e)=>{
    e.preventDefault();
-   axios.post("http://localhost:8080/api/search",{cari:this.state.value}, {headers: {
+   axios.post(`${process.env.REACT_APP_URL_API}search`,{cari:this.state.value}, {headers: {
      "x-access-token": localStorage.getItem("usertoken")
    }}).then((response) => {
      console.log(response);

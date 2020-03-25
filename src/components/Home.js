@@ -1,11 +1,10 @@
 import React, {Component} from 'react';
-import { Container, InputGroup, FormControl, Row, Col, Spinner, Media,Card, Table, Form, Image, Header, Pagination, Badge, ButtonGroup, Button, Modal } from 'react-bootstrap';
-import Axios from "axios";
+import { Container, InputGroup, FormControl, Row, Col, Spinner, Card, Badge, ButtonGroup, Button, Modal } from 'react-bootstrap';
 import qs from "qs";
 import { connect } from "react-redux";
 import { getProducts } from "../redux/actions/product";
 import { checkout, getCheckout } from "../redux/actions/checkout";
-// import MydModalWithGrid from "MydModalWithGrid";
+
 class Home extends Component {
   constructor(props){
     super(props)
@@ -129,6 +128,14 @@ class Home extends Component {
   };
 
   render(){
+    function statusStock(num) {
+      if(num===0){
+        return <small code className='text-danger'> /kosong</small>
+      }else{
+        return <small code className='text-hide'>/tersedia</small>
+      } 
+    }
+
     function formatNumber(num) {
       return "Rp. " + num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
     }
@@ -170,14 +177,15 @@ class Home extends Component {
                       <Card>
                         <Card.Title>{formatCapitalize(product.name)}</Card.Title>
                         <Card.Text>
-                          {formatNumber(product.price)}
+                  {formatNumber(product.price)} {statusStock(product.stock)}
                         </Card.Text>
                         <Card.Text>
+                          
                         </Card.Text>
                       </Card>
                       {
                         this.state.carts.filter((items) => new RegExp(product.id, "i").exec(items.id)).length === 1 ? (
-                          <div className="justify-content-md-center h-100" style={{position: 'absolute', bottom: 0, background: 'rgb(0, 0, 0)', background: 'rgba(0, 0, 0, 0.5)', color: '#f1f1f1', width: '100%', padding: '20px'}}>
+                          <div className="justify-content-md-center h-100" style={{position: 'absolute', bottom: 0, background: 'rgba(0, 0, 0, 0.5)', color: '#f1f1f1', width: '100%', padding: '20px'}}>
                             <i className="fa fa-check-square-o btn-outline-warning" aria-hidden="true"></i>
                           </div>
                         ) : null
@@ -309,7 +317,7 @@ function MydModalWithGrid(props) {
                   <code>-</code>
                 </Col>
               </Row>
-              <Row className="show-grid"   className="border-bottom">
+              <Row className="show-grid border-bottom">
                 <Col md={3}> <code>Qty</code> </Col>
                 <Col md={3}> <code>Item</code> </Col>
                 <Col md={3}> <code>Price</code> </Col>
@@ -327,7 +335,7 @@ function MydModalWithGrid(props) {
                   )
                 })
               }
-              <Row className="show-grid"   className="border-top">
+              <Row className="show-grid border-bottom">
                 <Col md={4}> <code>sub total</code> </Col>
                 <Col md={2}> <code> </code> </Col>
                 <Col md={2}> <code> </code> </Col>
@@ -339,7 +347,7 @@ function MydModalWithGrid(props) {
                 <Col md={3}> <code>|10%</code> </Col>
                 <Col md={4}> <code>{ppn}</code> </Col>
               </Row>
-              <Row className="show-grid" className="border">
+              <Row className="show-grid border-bottom">
                 <Col md={4}> <code>Total</code> </Col>
                 <Col md={2}> <code> </code> </Col>
                 <Col md={2}> <code> </code> </Col>
@@ -350,9 +358,9 @@ function MydModalWithGrid(props) {
               </Row>
             </Container>
           </Modal.Body>
-          <Modal.Footer>
-            <Button>Close</Button>
-          </Modal.Footer>
+          <div className="modal-footer">
+            <button type="button" className="btn btn-secondary" data-dismiss="modal">Selesai</button>
+          </div>
           </>
         )
       }
