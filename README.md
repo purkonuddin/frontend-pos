@@ -2,7 +2,7 @@
   <br>
   <img src="https://raw.githubusercontent.com/purkonuddin/frontend-pos/master/src/assets/food-and-restaurant.png" width="200">
   <br>
-  D'Jago Frontend React Redux
+  Point of Sale React Web App
   <br>
 </h1>
 
@@ -69,4 +69,4 @@ POS Frontend is a Point of Sale React Web App. Written in React Js with Redux, i
 
 ## Related Project
 
-- [API-backend-pos (Back-end Web App)`](https://github.com/purkonuddin/API-backend-pos) 
+- [API-backend-pos (Back-end Web App)`](https://github.com/purkonuddin/API-backend-pos)
