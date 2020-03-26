@@ -64,7 +64,7 @@ POS Frontend is a Point of Sale React Web App. Written in React Js with Redux, i
 ## Release Website
 
 <a href="http://18.206.201.80:3000/login">
-  <img src="https://img.shields.io/badge/Visit%20on%20the-18.206.61.46-blue.svg?style=popout&logo=amazon-aws"/>
+  <img src="https://img.shields.io/badge/Visit%20on%20the-18.206.201.80-blue.svg?style=popout&logo=amazon-aws"/>
 </a>
 
 ## Related Project
