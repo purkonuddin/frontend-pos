@@ -159,9 +159,9 @@ class Products extends Component {
   // }
 
   reloadData=()=>{
-    axios.get(`${process.env.REACT_APP_URL_API}pagination/0/2`)
+    axios.get(`${process.env.REACT_APP_URL_API}pagination/1/2`)
     .then(res=>{
-      console.log('--->',res.data);
+      // console.log('--->',res.data);
       this.setState({
         dataProduct:res.data.result,
         nextpage:res.data.next_page || null,
@@ -178,11 +178,36 @@ class Products extends Component {
   category=()=>{
     axios.get(`${process.env.REACT_APP_URL_API}category/`)
     .then(res=>{
-      console.log(res.data.data);
+      // console.log(res.data.data);
       this.setState({
         dataCategory:res.data.data 
       })
     })
+  }
+
+  makeHttpRequestWithPage = async pageNumber => {
+    let response = await fetch(`${process.env.REACT_APP_URL_API}pagination/${pageNumber}/2`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+
+    // console.log('paging',data);
+    this.setState({
+      dataProduct:data.result,
+      nextpage:data.next_page || null,
+      prevpage:data.prev_page || null,
+      perpage:data.per_page,
+      totalrows:data.total,
+      totalpage:data.total_page,
+      currenpage:data.curren_page,
+      edit:false
+    })
+    
   }
 
   componentDidMount(){
@@ -191,7 +216,45 @@ class Products extends Component {
   }
 
   render(){
-    console.log(this.state);
+    // console.log(this.state);
+    let products, renderPageNumbers;
+
+    if (this.state.dataProduct !== null) {
+      products = this.state.dataProduct.map((product, index)=>{
+        return(
+          <tr key={index}>
+            <td >{index+1}{') '}</td>
+            <td className='text-capitalize'>{product.name}</td>
+            <td>{product.description}</td>
+            <td>{product.stock}</td>
+            <td>{formatNumber(product.price)}</td>
+            <td>
+            <span>
+                <button className="btn btn-sm btn-danger" value={product.id} onClick={this.setDelete}  data-toggle="modal" data-target="#hapusModal">delete</button>
+                <button className="btn btn-sm btn-primary" data-toggle="modal" data-target="#exampleModal" value={product.id} onClick={this.getDataId}>edit</button>
+            </span>
+            </td>
+          </tr>
+        );
+      })
+    }
+
+    const pageNumbers = [];
+    if (this.state.totalrows !== null) {
+      for (let i = 1; i <= Math.ceil(this.state.totalrows / this.state.perpage); i++) {
+        pageNumbers.push(i);
+      }
+
+
+      renderPageNumbers = pageNumbers.map(number => {
+        let classes = this.state.currenpage === number ? 'btn btn-success' : 'btn';
+
+        return (
+          <span key={number} className={classes} onClick={() => this.makeHttpRequestWithPage(number)}>{number}</span>
+        );
+      });
+    }
+
     
     function formatNumber(num) {
       return "Rp. " + num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
@@ -213,35 +276,43 @@ class Products extends Component {
                 <tr className='list-group-item-warning'><th className='p-2'>#</th><th className='w-25'>Items</th><th>Description</th><th>Stock</th><th>Price</th><th>Actions</th></tr>
                 </thead>
                 <tbody>
-              {
-                this.state.dataProduct.map((product, index)=>{
-                  return(
-                    <tr key={index}>
-                      <td >{index+1}{') '}</td>
-                      <td className='text-capitalize'>{product.name}</td>
-                      <td>{product.description}</td>
-                      <td>{product.stock}</td>
-                      <td>{formatNumber(product.price)}</td>
-                      <td>
-                      <span>
-                          <button className="btn btn-sm btn-danger" value={product.id} onClick={this.setDelete}  data-toggle="modal" data-target="#hapusModal">delete</button>
-                          <button className="btn btn-sm btn-primary" data-toggle="modal" data-target="#exampleModal" value={product.id} onClick={this.getDataId}>edit</button>
-                      </span>
-                      </td>
-                    </tr>
-                  );
-                })
+              { products
+                // this.state.dataProduct.map((product, index)=>{
+                //   return(
+                //     <tr key={index}>
+                //       <td >{index+1}{') '}</td>
+                //       <td className='text-capitalize'>{product.name}</td>
+                //       <td>{product.description}</td>
+                //       <td>{product.stock}</td>
+                //       <td>{formatNumber(product.price)}</td>
+                //       <td>
+                //       <span>
+                //           <button className="btn btn-sm btn-danger" value={product.id} onClick={this.setDelete}  data-toggle="modal" data-target="#hapusModal">delete</button>
+                //           <button className="btn btn-sm btn-primary" data-toggle="modal" data-target="#exampleModal" value={product.id} onClick={this.getDataId}>edit</button>
+                //       </span>
+                //       </td>
+                //     </tr>
+                //   );
+                // })
               }
               </tbody>
               <tfoot></tfoot>
               </table>
               
               </Card.Body>
-              <Card.Footer> 
-                <button value={this.state.prevpage}>prev</button> 
-                <button disabled>{this.state.currenpage}</button>
-                <button value={this.state.nextpage}>next</button>  
+              <Card.Footer>
+                <div>
+                <span className='btn' onClick={() => this.makeHttpRequestWithPage(1)}>&laquo;</span>
+                <span className='btn' onClick={() => this.makeHttpRequestWithPage(this.state.prevpage)}>Prev</span>
+                {renderPageNumbers}
+                <span className='btn' onClick={() => this.makeHttpRequestWithPage(this.state.nextpage)}>Next</span>
+                <span className='btn' onClick={() => this.makeHttpRequestWithPage(this.state.totalpage)}>&raquo;</span>
                 page: {this.state.currenpage} of {this.state.totalpage}. rows: {this.state.totalrows}
+                </div> 
+                {/* <button value={this.state.prevpage} onClick={() => this.makeHttpRequestWithPage(this.state.prevpage)}>prev</button> 
+                <button disabled>{this.state.currenpage}</button>
+                <button value={this.state.nextpage} onClick={() => this.makeHttpRequestWithPage(this.state.nextpage)}>next</button>  
+                page: {this.state.currenpage} of {this.state.totalpage}. rows: {this.state.totalrows} */}
               </Card.Footer>
             </Card>
             </Col>
