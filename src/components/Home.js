@@ -4,27 +4,86 @@ import qs from "qs";
 import { connect } from "react-redux";
 import { getProducts } from "../redux/actions/product";
 import { checkout, getCheckout } from "../redux/actions/checkout";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 class Home extends Component {
   constructor(props){
     super(props)
-    this.state={
+    this.state={ 
+      per: 3,
+      page: 1,
+      total_pages: null,
+      items: [],
       productData:[],
       allProductData:[],
       carts:[],
       checkoutDetail:[],
       no_transaction:0,
       modalShow:false,
-      search: ""
+      search: "",
+      sortby: 'name',
+      orderbyasc: true,
     }
   }
+
+  // infinite scroll
+  // fetchMoreData = async () => { 
+  //   const { per, page } = this.state;
+  //   let response = await fetch(`${process.env.REACT_APP_URL_API}pagination/products?page=${page}&limit=${per}`, {
+  //     method: 'GET',
+  //     headers: {
+  //       'Accept': 'application/json',
+  //       'Content-Type': 'application/json',
+  //     },
+  //   });
+
+  //   const data = await response.json();
+  //   console.log(data); 
+    
+  //   setTimeout(() => {
+  //     this.setState({
+  //       items: this.state.items.concat(data.data),
+  //       total_pages:data.total_page
+  //     });
+  //   }, 1500);
+
+  //   this.setState(
+  //     prevState => ({
+  //       page: prevState.page + 1, 
+  //     }) 
+  //   );
+
+  // };
+  // end of infiniter scroll
 
   handleSearch = (event) => {
     this.setState({
       search: event.target.value,
       productData: this.state.allProductData.filter((items) => new RegExp(event.target.value, "i").exec(items.name))
-    })
-    // console.log('panjang cari :', this.state.productData);
+    }) 
+  }
+
+  handleOrderBy = async (event) =>{ 
+    await this.setState({
+      orderbyasc: event.target.value
+    }) 
+  }
+
+  handleSort = async (event) =>{
+    let asc = this.state.orderbyasc;
+    let prop = event.target.value;
+    console.log('asc', asc);
+    
+    await this.setState({
+      sortby: event.target.value,
+      productData: this.state.allProductData.sort(function(a, b) {
+        if (asc) {
+            return (a[prop] > b[prop]) ? 1 : ((a[prop] < b[prop]) ? -1 : 0);
+        } else {
+            return (b[prop] > a[prop]) ? 1 : ((b[prop] < a[prop]) ? -1 : 0);
+        }
+      })
+    }) 
   }
 
   setModalShow = ()=>{
@@ -115,24 +174,27 @@ class Home extends Component {
     }
   };
 
-  getProduct = async () => {
+  getProduct = async (prop, asc) => {
     await this.props.dispatch(getProducts());
-    this.setState({
-      productData: this.props.product.productData,
-      allProductData: this.props.product.productData
-    });
-  };
+    const data = this.props.product.productData; 
 
-  componentDidMount = () => {
+    await this.setState({
+      productData: data,
+      allProductData: this.props.product.productData
+    }); 
+  }; 
+
+  componentDidMount = () => { 
     this.getProduct();
+    // this.fetchMoreData();
   };
 
   render(){
     function statusStock(num) {
       if(num===0){
-        return <small code className='text-danger'> /kosong</small>
+        return <small className='text-danger'> /kosong</small>
       }else{
-        return <small code className='text-hide'>/tersedia</small>
+        return <small className='text-hide'>/tersedia</small>
       } 
     }
 
@@ -158,6 +220,7 @@ class Home extends Component {
           {!this.props.product.isPending ? (
             <>
             <Row  className="justify-content-md-center mt-lg-2 ml-lg-5 mr-lg-5">
+              <Col>
                <InputGroup className="mb-3">
                   <InputGroup.Prepend  placeholder="Search...">
                     <InputGroup.Text id="basic-addon3">
@@ -165,8 +228,43 @@ class Home extends Component {
                     </InputGroup.Text>
                   </InputGroup.Prepend>
                   <FormControl id="basic-url"  value={this.state.search} onChange={this.handleSearch} aria-describedby="basic-addon3" />
+                </InputGroup> 
+              </Col>
+              <Col className='col-md-12 col-lg-5 col-sm-12'>
+                <Row>
+                <Col>
+                <InputGroup className="mb-3">
+                  <InputGroup.Prepend  placeholder="price">
+                    <InputGroup.Text id="basic-addon3">
+                      sort by :
+                    </InputGroup.Text>
+                  </InputGroup.Prepend>
+                  <select aria-describedby="basic-addon3" id="basic-url" className="form-control" value={this.state.sortby} onChange={this.handleSort}>
+                    <option value={this.state.sortby}>{this.state.sortby}</option>
+                    <option value='name'>name</option>
+                    <option value='price'>price</option>
+                  </select>
+                  {/* <FormControl id="basic-url"  value={this.state.search} onChange={this.handleSearch} aria-describedby="basic-addon3" /> */}
                 </InputGroup>
-            </Row>
+                </Col>
+                <Col className='col-lg-5'>
+                <InputGroup className="mb-3">
+                  <InputGroup.Prepend  placeholder="asc">
+                    <InputGroup.Text id="basic-addon3">
+                      a-z
+                    </InputGroup.Text>
+                  </InputGroup.Prepend>
+                  <select aria-describedby="basic-addon3" id="basic-url" className="form-control" value={this.state.orderbyasc} onChange={() => this.setState({orderbyasc:!this.state.orderbyasc})}>
+                    <option value={this.state.orderbyasc}>{this.state.orderbyasc === true ? 'asc':'desc'}</option>
+                    <option value={true}>asc</option>
+                    <option value={false}>desc</option>
+                  </select>
+                  {/* <FormControl id="basic-url"  value={this.state.search} onChange={this.handleSearch} aria-describedby="basic-addon3" /> */}
+                </InputGroup>
+                </Col>
+                </Row>
+              </Col>
+            </Row> 
             <Row  className="justify-content-md-center">
 
               {
@@ -200,8 +298,42 @@ class Home extends Component {
               <Row  className="justify-content-md-center">
                 <Spinner animation="border" /> Loading...
               </Row>
-            )
+            )  
           }
+                    {/* <Row  className="justify-content-md-center" id="scrollableDiv" style={{ height: 300, overflow: "auto" }}>
+                      <InfiniteScroll
+                        dataLength={this.state.items.length}
+                        next={this.fetchMoreData}
+                        hasMore={true}
+                        loader={this.state.page < this.state.total_pages+2 ? (
+                          <h4>loading...</h4>
+                        ):(<p>result : {this.state.items.length} items</p>)
+                        }
+                        scrollableTarget="scrollableDiv"
+                      >
+                        {this.state.items.map((product, index) => (
+                          <Card style={{ width: '10rem', cursor: 'pointer' }} key={index} onClick={() => this.selectedProduct(product)} className="m-1 mt-2">
+                            <Card.Img variant="top" src={product.image} />
+                            <Card>
+                              <Card.Title>{formatCapitalize(product.name)}</Card.Title>
+                              <Card.Text>
+                        {formatNumber(product.price)} {statusStock(product.stock)}
+                              </Card.Text>
+                              <Card.Text>
+                                
+                              </Card.Text>
+                            </Card>
+                            {
+                              this.state.carts.filter((items) => new RegExp(product.id, "i").exec(items.id)).length === 1 ? (
+                                <div className="justify-content-md-center h-100" style={{position: 'absolute', bottom: 0, background: 'rgba(0, 0, 0, 0.5)', color: '#f1f1f1', width: '100%', padding: '20px'}}>
+                                  <i className="fa fa-check-square-o btn-outline-warning" aria-hidden="true"></i>
+                                </div>
+                              ) : null
+                            }
+                          </Card>
+                        ))}
+                      </InfiniteScroll> 
+                  </Row> */}
         </Col>
         <Col className="bg-white border-left p-0 border-0" style={{minHeight:'300px'}} sm={4}>
           <Card className="text-center">
@@ -262,6 +394,7 @@ class Home extends Component {
 
         </Col>
       </Row>
+      
 
       <MydModalWithGrid {...this.props} no_transaction={this.state.no_transaction} show={this.state.modalShow} onHide={this.setModalShow} />
 

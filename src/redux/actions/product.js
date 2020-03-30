@@ -26,3 +26,15 @@ export const getProducts = () => {
     })
   };
 };
+
+export const pagingProducts = (page, per) => {
+  return {
+    type: "PAGING_PRODUCT",
+    payload: Axios.get(`${process.env.REACT_APP_URL_API}pagination/products?page=${page}&limit=${per}`, {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      }
+    })
+  };
+};

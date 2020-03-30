@@ -1,12 +1,16 @@
 import React, {Component} from 'react';
 import { Container, Row, Col, Form, Image, Card } from 'react-bootstrap';
-import axios from 'axios';
-import {connect} from 'react-redux';
+import axios from 'axios'; 
+import { connect } from "react-redux";
+import { pagingProducts } from "../redux/actions/product";
 
 class Products extends Component {
   constructor(props){
     super(props);
     this.state={
+      page:1,
+      per:3,
+      perpage:3,
       dataCategory:[],
       dataProduct:[],
       dataPost:{
@@ -27,6 +31,14 @@ class Products extends Component {
       loaded: 0,
     };
     this.fileInput = React.createRef();
+  }
+
+  pagingProducts=async()=>{
+    const { per, page } = this.state;
+    await this.props.dispatch(pagingProducts(page, per));
+    const data = this.props;
+    console.log('paging rdx :', data);
+     
   }
 
   onChangeHandler=event=>{
@@ -73,11 +85,11 @@ class Products extends Component {
   }
 
   getDataId=(e)=>{
-    console.log(e.target.value);
+    // console.log(e.target.value);
     
     axios.get(`${process.env.REACT_APP_URL_API}product/${e.target.value}`)
       .then(res=>{
-        console.log(res.data.data[0]);
+        // console.log(res.data.data[0]);
         this.setState({
           dataPost:res.data.data[0],
           edit:true
@@ -159,7 +171,7 @@ class Products extends Component {
   // }
 
   reloadData=()=>{
-    axios.get(`${process.env.REACT_APP_URL_API}pagination/1/2`)
+    axios.get(`${process.env.REACT_APP_URL_API}pagination/1/${this.state.perpage}`)
     .then(res=>{
       // console.log('--->',res.data);
       this.setState({
@@ -186,7 +198,7 @@ class Products extends Component {
   }
 
   makeHttpRequestWithPage = async pageNumber => {
-    let response = await fetch(`${process.env.REACT_APP_URL_API}pagination/${pageNumber}/2`, {
+    let response = await fetch(`${process.env.REACT_APP_URL_API}pagination/${pageNumber}/${this.state.perpage}`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -197,6 +209,9 @@ class Products extends Component {
     const data = await response.json();
 
     // console.log('paging',data);
+    data.result.sort(function(a, b){return a.price - b.price});
+    // console.log('sortdata', sortdata);
+    
     this.setState({
       dataProduct:data.result,
       nextpage:data.next_page || null,
@@ -213,6 +228,7 @@ class Products extends Component {
   componentDidMount(){
       this.reloadData();
       this.category();
+      this.pagingProducts();
   }
 
   render(){
@@ -223,7 +239,7 @@ class Products extends Component {
       products = this.state.dataProduct.map((product, index)=>{
         return(
           <tr key={index}>
-            <td >{index+1}{') '}</td>
+            <td >{product.id}{') '}</td>
             <td className='text-capitalize'>{product.name}</td>
             <td>{product.description}</td>
             <td>{product.stock}</td>
@@ -243,13 +259,12 @@ class Products extends Component {
     if (this.state.totalrows !== null) {
       for (let i = 1; i <= Math.ceil(this.state.totalrows / this.state.perpage); i++) {
         pageNumbers.push(i);
-      }
-
+      }  
 
       renderPageNumbers = pageNumbers.map(number => {
-        let classes = this.state.currenpage === number ? 'btn btn-success' : 'btn';
+        let classes = this.state.currenpage === number ? 'btn btn-success' : 'btn';  
 
-        return (
+        return ( 
           <span key={number} className={classes} onClick={() => this.makeHttpRequestWithPage(number)}>{number}</span>
         );
       });
@@ -266,7 +281,7 @@ class Products extends Component {
           <Card className='mt-3 mb-5'>
             <Card.Header>
             List Products 
-            <span>
+            <span className='cardx h-auto bg-transparent'>
             <button className="btn btn-sm btn-primary" data-toggle="modal" data-target="#exampleModal" onClick={this.clearData}>tambah</button>
             </span>
             </Card.Header>
@@ -302,12 +317,22 @@ class Products extends Component {
               </Card.Body>
               <Card.Footer>
                 <div>
+                {this.state.currenpage >= 2 && 
+                <>
                 <span className='btn' onClick={() => this.makeHttpRequestWithPage(1)}>&laquo;</span>
                 <span className='btn' onClick={() => this.makeHttpRequestWithPage(this.state.prevpage)}>Prev</span>
+                </>
+                }
                 {renderPageNumbers}
+                {this.state.currenpage < this.state.totalpage && 
+                <>
                 <span className='btn' onClick={() => this.makeHttpRequestWithPage(this.state.nextpage)}>Next</span>
                 <span className='btn' onClick={() => this.makeHttpRequestWithPage(this.state.totalpage)}>&raquo;</span>
+                </>
+                }
+                <span className='cardx h-auto bg-transparent'>
                 page: {this.state.currenpage} of {this.state.totalpage}. rows: {this.state.totalrows}
+                </span>
                 </div> 
                 {/* <button value={this.state.prevpage} onClick={() => this.makeHttpRequestWithPage(this.state.prevpage)}>prev</button> 
                 <button disabled>{this.state.currenpage}</button>
