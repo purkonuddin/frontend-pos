@@ -8,6 +8,7 @@ class Users extends Component {
   constructor(props){
     super(props);
     this.state={
+      uploadimage:false,
       dataprofile:[],
       dataUser:[], 
       dataPost:{
@@ -17,6 +18,7 @@ class Users extends Component {
         status:'',
         image:'',
       },
+      confirmPassword: '',
       edit:false,
       deleteid: '',
       delete:false,
@@ -25,6 +27,40 @@ class Users extends Component {
       loaded: 0,
     };
     this.fileInput = React.createRef();
+  }
+ 
+  password = (value) => {
+    const strongRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})");
+    const mediumRegex = new RegExp("^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})");
+
+    if(strongRegex.test(value)) {
+      this.setState({ message:'strong' })
+    } else if(mediumRegex.test(value)) {
+      this.setState({ message:'medium' })
+    } else {
+      this.setState({message: 'The password must contain at least 1 lowercase alphabetical character, at least 1 uppercase alphabetical character, at least 1 numeric character, at least one special character and must be eight characters or longer'});
+    }
+
+    let newdatapost = {...this.state.dataPost}
+    newdatapost['password']=value;
+    this.setState({
+      dataPost:newdatapost 
+    },()=>console.log(this.state.dataPost));
+  } 
+
+  handlePassword = (event) => {
+    this.password(event.target.value);
+    
+  }
+
+  handleConfirmPassword = (event) => {
+    console.log(event.target.value);
+    
+    if (event.target.value !== this.state.dataPost.password) {
+      this.setState({message:'handle confirm password: not match'});
+    }else{
+      this.setState({message:'', confirmPassword:event.target.value});
+    }
   }
 
   onChangeHandler=event=>{
@@ -67,13 +103,27 @@ class Users extends Component {
     })
   }
 
+  // uploadImageUser=(e)=>{
+  //   console.log(e.target.value);
+    
+  //   this.setState({uploadimage:!this.state.uploadimage});
+  //   // this.getDataId;
+  // }
+
   getDataId=async(e)=>{
-     console.log(e.target.value);
+    //  console.log('value : ',e.target.value);
+    //  console.log('upload :',e.target.id==='btnupload');
+     if (e.target.id==='btnupload') {
+       this.setState({uploadimage:!this.state.uploadimage});
+     }else{
+      this.setState({uploadimage:false});
+     }
      await axios.get(`${process.env.REACT_APP_URL_API}user/${e.target.value}`)
       .then((res)=>{
         // console.log('--',res.data[0]);
         this.setState({
           dataPost:res.data[0],
+          confirmPassword:res.data[0].password,
           edit:true
         },()=>console.log(this.state.dataPost))
       })
@@ -101,29 +151,57 @@ class Users extends Component {
       })
     }else{
       // this.handleSubmit();
-      const formuser = new FormData()
-      // formuser.set('name',this.state.dataPost.name)
-      // formuser.set('password',this.state.dataPost.password)
-      // formuser.set('status',this.state.dataPost.satatus) 
-      formuser.append('image',this.state.dataPost.image)  
-      // console.log('user->',this.state.dataPost);
+      if(this.state.uploadimage===true){
+        // post user image   
+        const formuser = new FormData()
+        // formuser.set('name',this.state.dataPost.name)
+        // formuser.set('password',this.state.dataPost.password)
+        // formuser.set('status',this.state.dataPost.satatus) 
+        formuser.append('image',this.state.dataPost.image)  
+        // console.log('user->',this.state.dataPost);
+        
+        axios.post(`${process.env.REACT_APP_URL_API}user/${this.state.dataPost.id}`, formuser, {
+          headers: {
+            "Content-Type": "multipart/form-data" 
+          }})
+        .then((result)=>{
+          this.reloadData();
+          this.clearData();
+          this.setState({
+            edit:false
+          });
+          console.log(result);
+        })
+        .catch(err => {
+          console.log(err)
+          this.setState({message:err})
+        })
+      }else{
+        const mediumRegex = new RegExp("^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})");
+                
+        if(mediumRegex.test(this.state.dataPost.password)===false){
+          this.setState({message:'check your password'})
+          console.log('gagal');
+          
+        }else if(this.state.dataPost.password !== this.state.confirmPassword){
+          this.setState({message:'password not match'})
+          console.log('gagal');
+        }else{
+          // patch user data
+          axios.patch(`${process.env.REACT_APP_URL_API}user/${this.state.dataPost.id}`, this.state.dataPost)
+          .then(()=>{
+            this.reloadData();
+            this.clearData();
+            this.setState({edit:false, message:'...updated! ... silahkan logout dan login kembali.'})
+            
+          })
+          .catch(err => {
+            console.log(err)
+            this.setState({message:err})
+          })
+        } 
+      }
       
-      axios.post(`${process.env.REACT_APP_URL_API}user/${this.state.dataPost.id}`, formuser, {
-        headers: {
-          "Content-Type": "multipart/form-data" 
-        }})
-      .then((result)=>{
-        this.reloadData();
-        this.clearData();
-        this.setState({
-          edit:false
-        });
-        console.log(result);
-      })
-      .catch(err => {
-        console.log(err)
-        this.setState({message:err})
-      })
     }
   }
 
@@ -173,7 +251,7 @@ class Users extends Component {
   }
 
   render(){ 
-    console.log(localStorage.userid === '1');
+    console.log(this.state.uploadimage);
     const uid = localStorage.userid;
   return (
     <Container fluid>
@@ -189,9 +267,10 @@ class Users extends Component {
                   <div key={index}>
                     <div className='cardx'>
                       <Image className='cardx img-thumbnail' src={profile.image}/> 
-                      <div className="justify-content-md-center" style={{cursor: 'pointer', position: 'absolute', background: 'rgba(0, 0, 0, 0.5)', color: '#f1f1f1', padding: '20px'}}>
-                        <button className="btn btn-sm" data-toggle="modal" data-target="#userModal" value={profile.id} onClick={this.getDataId}>
-                        edit{/* <i className="fa fa-edit btn-outline-warning" aria-hidden="true"></i> */}
+                      <div className="justify-content-md-center" style={{cursor: 'pointer', position: 'absolute', background: 'rgba(0, 0, 0, .075)', color: '#f1f1f1', padding: '20px'}}>
+                        <button className="btn btn-sm fa fa-edit btn-outline-warning" data-toggle="modal" data-target="#userModal" value={profile.id} id={'btnupload'} onClick={this.getDataId}>
+                        image
+                        {/* <span className="fa fa-edit btn-outline-warning" aria-hidden="true">upload</span> */}
                         </button>
                       </div>
                     </div>
@@ -210,7 +289,7 @@ class Users extends Component {
               <Card.Header>
               List User 
               <span>
-              <button className="btn btn-sm btn-primary" data-toggle="modal" data-target="#userModal" onClick={this.clearData}>tambah</button>
+              <button className="btn btn-sm btn-primary bg-primary cardx h-auto" data-toggle="modal" data-target="#userModal" onClick={this.clearData}>tambah</button>
               </span>
               </Card.Header>
               <Card.Body>
@@ -280,10 +359,20 @@ class Users extends Component {
                       password
                     </Form.Label>
                     <Col sm="10">
-                      <Form.Control type="text" name="password" value={this.state.dataPost.password} onChange={this.inputChange} placeholder="password" />
+                      <Form.Control type="password" name="password" onChange={this.handlePassword} placeholder="password" />
                     </Col>
                   </Form.Group>
-                  {this.state.edit===true?(
+                  {this.state.edit===true && this.state.uploadimage===false && 
+                    <Form.Group as={Row} controlId="formPlaintextStock" className='has-warning'>
+                      <Form.Label column sm="2">
+                        confirm password
+                      </Form.Label>
+                      <Col sm="10">
+                      <Form.Control type="password" name="comfirmpassword" onChange={this.handleConfirmPassword} placeholder="confirm password" />
+                      </Col> 
+                    </Form.Group>
+                  }
+                  {this.state.edit===true && this.state.uploadimage===true?(
                     <Form.Group as={Row} controlId="formPlaintextImage">
                       <Form.Label column sm="2">
                         Image
@@ -320,7 +409,7 @@ class Users extends Component {
                     </Form.Control>
                     </Col>
                   </Form.Group>
-
+                  <p>{this.state.message}</p>
                 </Form>
                 <div className="alert alert-light" role="alert">
                   {this.state.msg}

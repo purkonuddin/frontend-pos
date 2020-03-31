@@ -34,20 +34,20 @@ class Search extends Component{
   render(){
     return(
       <Container fluid>
-        <Row className="justify-content-md-center">
+        <Row className="justify-content-md-center card mt-3 row">
           <Form inline onSubmit={this.handleSubmit}>
-            <FormControl type="text" placeholder="Search" name="cari" className=" mr-sm-2" value={this.setState.value} onChange={this.handleChange}/>
-            <Button type="submit" value="search" variant="link" className="btn btn-link"><i className="fa fa-search"></i></Button>
+            <FormControl type="text" placeholder="Search" name="cari" className="card-img-overlay form-check-input form-control m-sm-3 w-752" value={this.setState.value} onChange={this.handleChange}/>
+            <Button type="submit" value="search" variant="link" className="badge-warning btn btn-link card-link"><i className="fa fa-search"></i></Button>
           </Form>
         </Row>
-        <Row  className="justify-content-md-center">
+        <Row className='justify-content-md-center'>
           {
             this.state.searchResponse.length !== 0 ? (
               <div>
-                <Row  className="justify-content-md-center">
+                <Row className="carousel-fade justify-content-md-center mt-3 row text-muted">
                 <p>Result : <span>{this.state.searchResponse.length}</span> data found</p>
                 </Row>
-                <Row  className="justify-content-md-center">
+                <Row className="justify-content-md-center">
                   {
                     this.state.searchResponse.map((data, index)=>{
                       return(
@@ -68,7 +68,11 @@ class Search extends Component{
                   </Row>
                 </div>
             ) : (
-              <div>result ...!</div>
+              <div>
+                <Row className="carousel-fade justify-content-md-center mt-3 row text-muted">
+                <p>cari item dan enter</p>
+                </Row>
+              </div>
             )
           }
         </Row>

@@ -4,7 +4,7 @@ import qs from "qs";
 import { connect } from "react-redux";
 import { getProducts } from "../redux/actions/product";
 import { checkout, getCheckout } from "../redux/actions/checkout";
-import InfiniteScroll from "react-infinite-scroll-component";
+// import InfiniteScroll from "react-infinite-scroll-component";
 
 class Home extends Component {
   constructor(props){
