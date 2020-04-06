@@ -36,8 +36,12 @@ POS Frontend is a Point of Sale React Web App. Written in React Js with Redux, i
 
 ## Demo
 
-![Screenshot](https://user-images.githubusercontent.com/44079569/76099674-0cd77480-5ffe-11ea-9ebb-4ac09f88b1cb.png)
-![Screenshot](https://user-images.githubusercontent.com/44079569/76099669-0b0db100-5ffe-11ea-9db5-4e36f569a9ed.png)
+![Screenshot](https://user-images.githubusercontent.com/44079569/78572759-0ed96100-7852-11ea-8f40-fdcf54875c16.png)
+![Screenshot](https://user-images.githubusercontent.com/44079569/78572840-2dd7f300-7852-11ea-821f-b5ca967c77aa.png)
+![Screenshot](https://user-images.githubusercontent.com/44079569/78572874-392b1e80-7852-11ea-934f-d7c88453e2f0.png)
+![Screenshot](https://user-images.githubusercontent.com/44079569/78572769-139e1500-7852-11ea-8141-1d8b69221953.png)
+![Screenshot](https://user-images.githubusercontent.com/44079569/78574384-1ef24000-7854-11ea-9234-7ae915dfb9c2.png)
+![Screenshot](https://user-images.githubusercontent.com/44079569/76099675-0d700b00-5ffe-11ea-88af-e36582c4dce0.png)
 
 ## How To Install
 
@@ -53,7 +57,7 @@ POS Frontend is a Point of Sale React Web App. Written in React Js with Redux, i
 3. Create `.env` file with environment variable in line with following:
 
    ```
-   REACT_APP_URL_API = http://{your-url}:{your-port}/api/v1/
+   REACT_APP_URL_API = http://{your-url}:{your-port}/api/
    ```
 
 4. Run
