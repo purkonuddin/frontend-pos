@@ -74,3 +74,4 @@ POS Frontend is a Point of Sale React Web App. Written in React Js with Redux, i
 ## Related Project
 
 - [API-backend-pos (Back-end Web App)](https://github.com/purkonuddin/API-backend-pos)
+- [Android-React Native-pos (Frond-end Mobile App)](https://github.com/purkonuddin/pos-react-native)
